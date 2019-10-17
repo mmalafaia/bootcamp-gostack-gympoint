@@ -13,9 +13,9 @@ class App {
     this.server.use(express.json());
   }
 
-  routes () {
+  routes() {
     this.server.use(routes);
-  } 
+  }
 }
 
 export default new App().server;
