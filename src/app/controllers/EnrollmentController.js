@@ -4,6 +4,8 @@ import { startOfHour, parseISO, isBefore, addMonths } from 'date-fns';
 import Enrollment from '../models/Enrollment';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
+import EnrollmentMail from '../jobs/EnrollmentMail';
+import Queue from '../../lib/Queue';
 
 class EnrollmentController {
   async list(req, res) {
@@ -76,6 +78,12 @@ class EnrollmentController {
       price,
     });
 
+    await Queue.add(EnrollmentMail.key, {
+      enrollment: enrollment.dataValues,
+      plan: plan.dataValues,
+      student: student.dataValues,
+    });
+
     return res.json(enrollment);
   }
 
@@ -141,13 +149,17 @@ class EnrollmentController {
 
     const { id } = req.params;
 
-    const enrollment = await Enrollment.findOne({ where: { id } });
+    const enrollment = await Enrollment.findByPk(id);
 
     if (!enrollment) {
       return res.status(400).json({ error: 'Plan does not exists.' });
     }
 
     await enrollment.destroy(req.params);
+
+    await Queue.add(EnrollmentMail.key, {
+      enrollment,
+    });
 
     return res.json({ ok: true });
   }
