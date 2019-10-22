@@ -17,16 +17,14 @@ module.exports = {
       question: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
       answer: {
         type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
+        allowNull: true,
       },
       answer_at: {
         type: Sequelize.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,

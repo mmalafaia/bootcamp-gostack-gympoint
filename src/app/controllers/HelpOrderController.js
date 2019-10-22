@@ -1,76 +1,64 @@
 import * as Yup from 'yup';
 import Student from '../models/Student';
+import HelpOrder from '../models/HelpOrder';
 
 class HelpOrderController {
   async store(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string()
-        .email()
-        .required(),
-      age: Yup.number()
-        .integer()
-        .required(),
-      weight: Yup.number().required(),
-      height: Yup.number().required(),
+    const schemaBody = Yup.object().shape({
+      question: Yup.string().required(),
     });
 
-    if (!(await schema.isValid(req.body))) {
+    if (!(await schemaBody.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const studentExists = await Student.findOne({
-      where: { email: req.body.email },
+    const schemaParams = Yup.object().shape({
+      student_id: Yup.number()
+        .integer()
+        .required(),
     });
 
-    if (studentExists) {
-      return res.status(400).json({ error: 'User alredy exists.' });
+    if (!(await schemaParams.isValid(req.params))) {
+      return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { id, name, email, age, weight, height } = await Student.create(
-      req.body
-    );
+    const studentExists = await Student.findByPk(req.params.student_id);
+
+    if (!studentExists) {
+      return res.status(400).json({ error: 'Student does not exists.' });
+    }
+
+    const { id } = await HelpOrder.create({
+      student_id: req.params.student_id,
+      question: req.body.question,
+    });
 
     return res.json({
       id,
-      name,
-      email,
-      age,
-      weight,
-      height,
     });
   }
 
   async index(req, res) {
     const schema = Yup.object().shape({
-      name: Yup.string(),
-      email: Yup.string().email(),
-      age: Yup.number().integer(),
-      weight: Yup.number(),
-      height: Yup.number(),
+      student_id: Yup.number()
+        .integer()
+        .required(),
     });
 
-    if (!(await schema.isValid(req.body))) {
+    if (!(await schema.isValid(req.params))) {
       return res.status(400).json({ error: 'Validation fails' });
     }
-    const { email } = req.body;
+    const { student_id } = req.params;
 
-    const student = await Student.findOne({ where: { email } });
+    const student = await Student.findAll({ where: { id: student_id } });
 
     if (!student) {
       return res.status(400).json({ error: 'Student does not exists.' });
     }
 
-    const { id, name, age, weight, height } = await student.update(req.body);
+    const helporder = await HelpOrder.findAll({ where: { student_id } });
 
-    return res.json({
-      id,
-      name,
-      email,
-      age,
-      weight,
-      height,
-    });
+    return res.json(helporder);
   }
 }
 

@@ -1,4 +1,6 @@
 import * as Yup from 'yup';
+import { subDays } from 'date-fns';
+import { Op } from 'sequelize';
 import Student from '../models/Student';
 import Checkin from '../models/Checkin';
 
@@ -18,6 +20,19 @@ class CheckinController {
 
     if (!studentExists) {
       return res.status(400).json({ error: 'Student does not exists.' });
+    }
+
+    const checkin = await Checkin.findAndCountAll({
+      where: {
+        student_id: req.params.student_id,
+        created_at: { [Op.gte]: subDays(new Date(), 7) },
+      },
+    });
+
+    if (checkin.count > 5) {
+      return res
+        .status(400)
+        .json({ error: 'Maximum amount of checkins reached.' });
     }
 
     await Checkin.create(req.params);

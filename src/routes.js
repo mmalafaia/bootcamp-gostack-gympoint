@@ -35,6 +35,7 @@ routes.post('/students/:student_id/checking', CheckinController.store);
 routes.get('/students/:student_id/checking', CheckinController.index);
 routes.post('/students/:student_id/help-orders', HelpOrderController.store);
 routes.get('/students/:student_id/help-orders', HelpOrderController.index);
-routes.get('/help-orders/:id/answer', AnswerController.store);
+routes.get('/help-orders', AnswerController.list);
+routes.post('/help-orders/:id/answer', AnswerController.store);
 
 export default routes;
