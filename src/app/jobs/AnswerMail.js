@@ -2,24 +2,24 @@ import { format, parseISO } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import Mail from '../../lib/Mail';
 
-class EnrollmentMail {
+class AnswerMail {
   get key() {
-    return 'EnrollmentMail';
+    return 'AnswerMail';
   }
 
   async handle({ data }) {
-    const { enrollment, student, plan } = data;
+    const { question, answer, answer_at, student } = data;
 
     await Mail.sendMail({
       to: `${student.name} <${student.email}>`,
-      subject: 'Matrícula confirmada',
-      template: 'enrollment',
+      subject: 'Sua pergunta foi respondida',
+      template: 'answer',
       context: {
         student: student.name,
-        title: plan.title,
-        value: plan.price,
-        date: format(
-          parseISO(enrollment.start_date),
+        question,
+        answer,
+        answer_at: format(
+          parseISO(answer_at),
           "'dia' dd 'de' MMMM', às' H:mm'h'",
           {
             locale: pt,
@@ -30,4 +30,4 @@ class EnrollmentMail {
   }
 }
 
-export default new EnrollmentMail();
+export default new AnswerMail();
