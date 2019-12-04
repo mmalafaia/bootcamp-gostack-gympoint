@@ -103,7 +103,7 @@ class EnrollmentController {
       plan_id: Yup.number().integer(),
       start_date: Yup.date(),
       end_date: Yup.date(),
-      price: Yup.number().required(),
+      price: Yup.number(),
     });
 
     if (!(await schemaBody.isValid(req.body))) {

@@ -40,14 +40,6 @@ class PlanController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const schemaParams = Yup.object().shape({
-      id: Yup.number().required(),
-    });
-
-    if (!(await schemaParams.isValid(req.params))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     const { id, title, duration, price } = await Plan.create(req.body);
 
     return res.json({
