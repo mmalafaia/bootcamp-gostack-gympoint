@@ -1,4 +1,4 @@
-# bootcamp-gostack-gympoint
+# gympointBackend
 
 Instruções para Desafio final!
 Enviar os dockers para a correção
