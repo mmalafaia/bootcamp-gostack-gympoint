@@ -3,7 +3,17 @@ import Plan from '../models/Plan';
 
 class PlanController {
   async list(req, res) {
-    const plan = await Plan.findAll();
+    const schema = Yup.object().shape({
+      page: Yup.number().integer(),
+    });
+
+    if (!(await schema.isValid(req.query))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    const { page = 1 } = req.query;
+
+    const plan = await Plan.findAll({ limit: 20, offset: (page - 1) * 20 });
     return res.json(plan);
   }
 

@@ -54,7 +54,21 @@ class HelpOrderController {
   }
 
   async list(req, res) {
-    const helpOrder = await HelpOrder.findAll({ where: { answer: null } });
+    const schema = Yup.object().shape({
+      page: Yup.number().integer(),
+    });
+
+    if (!(await schema.isValid(req.query))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    const { page = 1 } = req.query;
+
+    const helpOrder = await HelpOrder.findAll({
+      where: { answer: null },
+      limit: 20,
+      offset: (page - 1) * 20,
+    });
 
     return res.json(helpOrder);
   }

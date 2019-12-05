@@ -81,18 +81,21 @@ class UserController {
   async list(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string(),
+      page: Yup.number().integer(),
     });
 
     if (!(await schema.isValid(req.query))) {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { name } = req.query;
+    const { name, page = 1 } = req.query;
     const { Op } = Sequelize;
 
     const user = await User.findAll({
       attributes: ['id', 'name', 'email'],
       where: name && { name: { [Op.like]: `%${name}%` } },
+      limit: 20,
+      offset: (page - 1) * 20,
     });
 
     if (!user) {
