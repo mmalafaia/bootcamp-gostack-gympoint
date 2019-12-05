@@ -9,7 +9,9 @@ import Queue from '../../lib/Queue';
 
 class EnrollmentController {
   async list(req, res) {
-    const enrollment = await Enrollment.findAll();
+    const enrollment = await Enrollment.findAll({
+      attributes: ['id', 'start_date', 'end_date', 'price', 'active'],
+    });
     return res.json(enrollment);
   }
 
@@ -24,7 +26,10 @@ class EnrollmentController {
 
     const { id } = req.params;
 
-    const enrollment = await Enrollment.findOne({ where: { id } });
+    const enrollment = await Enrollment.findOne({
+      attributes: ['id', 'start_date', 'end_date', 'price', 'active'],
+      where: { id },
+    });
 
     if (!enrollment) {
       return res.status(400).json({ error: 'Enrollment does not extists' });

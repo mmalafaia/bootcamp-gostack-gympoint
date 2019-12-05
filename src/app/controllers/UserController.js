@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import Sequelize from 'sequelize';
 import User from '../models/User';
 
 class UserController {
@@ -75,6 +76,30 @@ class UserController {
       email,
       provider,
     });
+  }
+
+  async list(req, res) {
+    const schema = Yup.object().shape({
+      name: Yup.string(),
+    });
+
+    if (!(await schema.isValid(req.query))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    const { name } = req.query;
+    const { Op } = Sequelize;
+
+    const user = await User.findAll({
+      attributes: ['id', 'name', 'email'],
+      where: name && { name: { [Op.like]: `%${name}%` } },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'User does not extists' });
+    }
+
+    return res.json(user);
   }
 }
 
