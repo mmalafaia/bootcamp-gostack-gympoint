@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import Sequelize from 'sequelize';
 import Student from '../models/Student';
 
 class StudentController {
@@ -71,6 +72,33 @@ class StudentController {
       weight,
       height,
     });
+  }
+
+  async list(req, res) {
+    const schema = Yup.object().shape({
+      name: Yup.string(),
+      page: Yup.number().integer(),
+    });
+
+    if (!(await schema.isValid(req.query))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    const { name, page = 1 } = req.query;
+    const { Op } = Sequelize;
+
+    const student = await Student.findAll({
+      attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
+      where: name && { name: { [Op.like]: `%${name}%` } },
+      limit: 20,
+      offset: (page - 1) * 20,
+    });
+
+    if (!student) {
+      return res.status(400).json({ error: 'Studant does not extists' });
+    }
+
+    return res.json(student);
   }
 }
 
