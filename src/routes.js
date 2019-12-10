@@ -23,6 +23,7 @@ routes.get('/users', UserController.list);
 routes.post('/students', StudentController.store);
 routes.put('/students', StudentController.update);
 routes.get('/students', StudentController.list);
+routes.delete('/students/:id', StudentController.delete);
 routes.get('/plans', PlanController.list);
 routes.get('/plans/:id', PlanController.index);
 routes.post('/plans', PlanController.store);

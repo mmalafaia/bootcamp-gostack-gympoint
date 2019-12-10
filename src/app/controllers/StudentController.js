@@ -100,6 +100,30 @@ class StudentController {
 
     return res.json(student);
   }
+
+  async delete(req, res) {
+    const schema = Yup.object().shape({
+      id: Yup.number()
+        .integer()
+        .required(),
+    });
+
+    if (!(await schema.isValid(req.params))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    const { id } = req.params;
+
+    const student = await Student.findOne({ where: { id } });
+
+    if (!student) {
+      return res.status(400).json({ error: 'Student does not exists.' });
+    }
+
+    await student.destroy(req.params);
+
+    return res.json({ ok: true });
+  }
 }
 
 export default new StudentController();
