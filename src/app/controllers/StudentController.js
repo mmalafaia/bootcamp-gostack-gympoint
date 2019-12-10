@@ -43,7 +43,14 @@ class StudentController {
   }
 
   async update(req, res) {
-    const schema = Yup.object().shape({
+    const schemaParam = Yup.object().shape({
+      id: Yup.number().required(),
+    });
+
+    if (!(await schemaParam.isValid(req.params))) {
+      return res.status(400).json({ error: 'Validation of params fails' });
+    }
+    const schemaBody = Yup.object().shape({
       name: Yup.string(),
       email: Yup.string().email(),
       age: Yup.number().integer(),
@@ -51,18 +58,19 @@ class StudentController {
       height: Yup.number(),
     });
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
+    if (!(await schemaBody.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation of body fails' });
     }
-    const { email } = req.body;
 
-    const student = await Student.findOne({ where: { email } });
+    const { id } = req.params;
+
+    const student = await Student.findOne({ where: { id } });
 
     if (!student) {
       return res.status(400).json({ error: 'Student does not exists.' });
     }
 
-    const { id, name, age, weight, height } = await student.update(req.body);
+    const { name, email, age, weight, height } = await student.update(req.body);
 
     return res.json({
       id,
