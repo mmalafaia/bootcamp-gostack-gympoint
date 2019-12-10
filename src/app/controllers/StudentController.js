@@ -98,6 +98,7 @@ class StudentController {
     const student = await Student.findAll({
       attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
       where: name && { name: { [Op.like]: `%${name}%` } },
+      order: [['name', 'ASC']],
       limit: 20,
       offset: (page - 1) * 20,
     });
