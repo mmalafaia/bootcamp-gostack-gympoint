@@ -20,7 +20,27 @@ class EnrollmentController {
     const { page = 1 } = req.query;
 
     const enrollment = await Enrollment.findAll({
-      attributes: ['id', 'start_date', 'end_date', 'price', 'active'],
+      attributes: [
+        'id',
+        'student_id',
+        'plan_id',
+        'start_date',
+        'end_date',
+        'price',
+        'active',
+      ],
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['title'],
+        },
+      ],
       limit: 20,
       offset: (page - 1) * 20,
     });
@@ -39,7 +59,27 @@ class EnrollmentController {
     const { id } = req.params;
 
     const enrollment = await Enrollment.findOne({
-      attributes: ['id', 'start_date', 'end_date', 'price', 'active'],
+      attributes: [
+        'id',
+        'student_id',
+        'plan_id',
+        'start_date',
+        'end_date',
+        'price',
+        'active',
+      ],
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['title'],
+        },
+      ],
       where: { id },
     });
 
