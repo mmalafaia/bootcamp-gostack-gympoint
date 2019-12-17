@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import * as Yup from 'yup';
 
 import User from '../models/User';
+import Student from '../models/Student';
 import authConfig from '../../config/auth';
 
 class SessionController {
@@ -10,7 +11,7 @@ class SessionController {
       email: Yup.string()
         .email()
         .required(),
-      password: Yup.string().required(),
+      password: Yup.string(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -18,18 +19,32 @@ class SessionController {
     }
 
     const { email, password } = req.body;
+    let id = 0;
+    let name = '';
 
-    const user = await User.findOne({ where: { email } });
+    if (password) {
+      const user = await User.findOne({ where: { email } });
 
-    if (!user) {
-      return res.status(401).json({ error: 'User not found' });
+      if (!user) {
+        return res.status(401).json({ error: 'User not found' });
+      }
+
+      if (!(await user.checkPassword(password))) {
+        return res.status(401).json({ error: 'Password does not match' });
+      }
+
+      id = user.id;
+      name = user.name;
+    } else {
+      const student = await Student.findOne({ where: { email } });
+
+      if (!student) {
+        return res.status(401).json({ error: 'Student not found' });
+      }
+
+      id = student.id;
+      name = student.name;
     }
-
-    if (!(await user.checkPassword(password))) {
-      return res.status(401).json({ error: 'Password does not match' });
-    }
-
-    const { id, name } = user;
 
     return res.json({
       user: {
