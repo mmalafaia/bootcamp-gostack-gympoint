@@ -85,6 +85,7 @@ class StudentController {
   async list(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string(),
+      email: Yup.string().email(),
       page: Yup.number().integer(),
     });
 
@@ -92,12 +93,17 @@ class StudentController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { name, page = 1 } = req.query;
+    const { name, page = 1, email } = req.query;
     const { Op } = Sequelize;
 
     const student = await Student.findAll({
       attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
-      where: name && { name: { [Op.like]: `%${name}%` } },
+      where: {
+        [Op.or]: [
+          name && { name: { [Op.like]: `%${name}%` } },
+          email && { email },
+        ],
+      },
       order: [['name', 'ASC']],
       limit: 20,
       offset: (page - 1) * 20,
