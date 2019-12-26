@@ -99,7 +99,7 @@ class StudentController {
     const student = await Student.findAll({
       attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
       where: {
-        [Op.or]: [
+        [Op.and]: [
           name && { name: { [Op.like]: `%${name}%` } },
           email && { email },
         ],
