@@ -65,6 +65,13 @@ class HelpOrderController {
     const { page = 1 } = req.query;
 
     const helpOrder = await HelpOrder.findAll({
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['name'],
+        },
+      ],
       where: { answer: null },
       limit: 20,
       offset: (page - 1) * 20,
